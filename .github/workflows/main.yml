@@ -14,7 +14,7 @@ jobs:
     
     - run: |
         docker pull azch/captureorder
-        docker tag azch/captureorder captureorder:${{ github.sha }}
+        docker tag azch/captureorder ${{ secrets.CONTAINER_REGISTRY }}/captureorder:${{ github.sha }}
         docker push ${{ secrets.CONTAINER_REGISTRY }}/captureorder:${{ github.sha }}
       
     # Set the target AKS cluster.
