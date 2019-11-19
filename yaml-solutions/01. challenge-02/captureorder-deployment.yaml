@@ -12,9 +12,11 @@ spec:
         labels:
             app: captureorder
       spec:
+        imagePullSecrets:
+        - name: acr-secret
         containers:
         - name: captureorder
-          image: azch/captureorder
+          image: captureorder
           imagePullPolicy: Always
           readinessProbe:
             httpGet:
