@@ -51,4 +51,3 @@ spec:
                 key: mongoPassword
           ports:
           - containerPort: 8080
-          
