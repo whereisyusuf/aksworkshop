@@ -16,7 +16,7 @@ spec:
         - name: acr-secret
         containers:
         - name: captureorder
-          image: captureorder
+          image: yusufran.azurecr.io/captureorder
           imagePullPolicy: Always
           readinessProbe:
             httpGet:
