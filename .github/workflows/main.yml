@@ -1,0 +1,41 @@
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    
+    - uses: Azure/docker-login@v1
+      with:
+        login-server: ${{ secrets.CONTAINER_REGISTRY }} 
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+    
+    - run: |
+        docker pull azch/captureorder
+        docker tag azch/captureorder captureorder:${{ github.sha }}
+        docker push ${{ secrets.CONTAINER_REGISTRY }}/captureorder:${{ github.sha }}
+      
+    # Set the target AKS cluster.
+    - uses: Azure/aks-set-context@v1
+      with:
+        creds: '${{ secrets.AZURE_CREDENTIALS }}'
+        cluster-name: yblaks
+        resource-group: yblaks
+        
+    - uses: Azure/k8s-create-secret@v1
+      with:
+        container-registry-url: ${{ secrets.CONTAINER_REGISTRY }}
+        container-registry-username: ${{ secrets.REGISTRY_USERNAME }}
+        container-registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+        secret-name: acr-secret
+
+    - uses: Azure/k8s-deploy@v1
+      with:
+        manifests: |
+          yaml-solutions/01. challenge-02/captureorder-deployment.yaml
+        images: |
+          ${{ secrets.CONTAINER_REGISTRY }}/captureorder:${{ github.sha }}
+        imagepullsecrets: |
+          acr-secret
